@@ -1,0 +1,531 @@
+############################################################
+###### AN?LISE DE REGRESS?O LINEAR #########################
+############################################################
+
+###### Modelo de regress?o Linear Simples - MRLS ###########
+
+## Exemplo 1: Os dados a seguir correspondem ? vari?vel renda 
+## familiar e gasto com alimenta??o (em unidades monet?rias) 
+## para uma amostra de 25 fam?lias. Em que:
+## X = Renda Familiar
+## Y = Gasto com Alimenta??o 
+
+## As vari?veis em estudo
+x <- c(3,5,10,10,20,20,20,30,40,50,60,70,70,80,100,100,100,
+       120,120,140,150,180,180,200,200)
+y <- c(1.5,2.0,6.0,7.0,10.0,12.0,15.0,8.0,10.0,20.0,20.0,25.0,
+       30.0,25.0,40.0,35.0,40.0,30.0,40.0,40.0,50.0,40.0,50.0,
+       60.0,50.0)
+
+##### An?lise de correla??o linear entre as vari?veis ########
+## Gr?fico: Diagrama de Dispers?o
+ plot(x,y, xlab="Renda Familiar (U.M.)", ylab="Gasto com Alimenta??o (U.M.)",
+     pch=16, las=1, 
+     main="Gasto com alimenta??o em fun??o da renda\n familiar em U.M.")
+
+## Calculo do coeficiente de correla??o
+ Sxx = sum((x - mean(x))^2); Sxx
+ Syy = sum((y - mean(y))^2); Syy
+ Sxy = sum((x - mean(x))*(y - mean(y))); Sxy  
+ r = Sxy/sqrt(Sxx*Syy); r
+
+## Ou simplesmente usando o fun??o do R
+  r = cor(x,y); r
+
+###### Teste de signific?ncia do Coeficiente de Correla??o ####
+## Testes de Normalidade
+require(nortest)
+Norm_test <-function(x){
+ t1 <- ks.test(x, "pnorm", mean=mean(x), sd=sd(x)) # KS
+ t2 <- lillie.test(x)                     # Lilliefors
+ t3 <- shapiro.test(x)                    # Shapiro-Wilk 
+ t4 <- ad.test(x)                         # Anderson-Darling
+ testes <- c(t1$method, t2$method, t3$method, t4$method)
+ valorp <- c(t1$p.value, t2$p.value, t3$p.value, t4$p.value)
+ resultados <- cbind(valorp)
+ rownames(resultados) <- testes
+ print(resultados, digits = 4)
+ }
+## Obs.: shapiro.test sugere-nos prefer?ncia em rela??o ao 
+##       ks.test para amostras de pequenas (n < 30)
+
+Norm_test(x)
+Norm_test(y)
+
+#### Teste hip?tese para o Coeficiente de Correla??o
+## H0: rho  = 0 =>  n?o existe correla??o entre X e Y.
+## H1: rho != 0 =>  existe correla??o entre X e Y.
+ct = cor.test(x,y); ct
+#p.value < alpha => teste significativo
+
+### P-valor
+pt(-15.27, 23) + (1 - pt(15.27, 23))
+#OU
+ct$`p.value`
+
+### t tabelado
+qt(0.975, 23)
+
+###############################################
+################## Ajuste do MRLS
+## Y = B0 + B1*X
+
+## Estimar os par?metros B0 e B1:
+B1 = Sxy/Sxx            ; B1 ##coeficiente angular
+B0 = mean(y) - B1*mean(x); B0 ##coeficiente linear
+
+##### Modelo Ajustado
+ mod <- lm(y ~ x); mod
+
+### Teste de signific?ncia para an?lise do par?meto B1
+## H0: B1  = 0 ## n?o existe rela??o linear entre X e Y
+## H1: B1 != 0 ## existe rela??o linear entre X e Y
+
+## Tabela de An?lide de Vari?ncia - ANOVA
+ SQT   = Syy; SQT            ## Soma dos Quadrados Total
+ SQReg = B1*Sxy; SQReg        ## Soma dos Quadrados da Regress?o
+ SQRes = Syy - B1*Sxy; SQRes  ## Soma dos Quadrados do Res?duo            
+ QMReg = SQReg/1; QMReg              ## Quadrado M?dio da Regress?o
+ QMRes = SQRes/(length(x)-2); QMRes  ## Quadrado M?dio do Res?duo
+ F = QMReg/QMRes ; F                 ## F observado
+
+ F_tab = qf(0.95, 1, 23); F_tab      ## F tabelado ao n?vel de signific?ncia
+ p_value = 1 - pf(F, 1, 23); p_value ## P valor ou p_value
+
+## Ou usando simplesmente o R
+ANOVA = anova(mod); ANOVA
+#p.value < alpha => teste significativo
+
+## An?lise detalhada para o ajuste do modelo
+ajuste = summary(mod); ajuste
+
+##### Intervalo de Confian?a ao n?vel de 95%
+## Para B1
+mod[[1]][[2]] + c(-1,1)*qt(0.975,23)*sqrt(QMRes/Sxx)
+## Para B0
+mod[[1]][[1]] + c(-1,1)*qt(0.975,23)*sqrt(QMRes*(1/length(x) + mean(x)^2/Sxx))
+
+## Usando o fun??o do R
+confint(mod, level=0.95)
+
+## Coeficiente de Determina??o
+ R2 = SQReg/SQT; R2
+# OU
+R2 = 1 - SQRes/SQT; R2
+# OU
+R2 = ajuste$r.squared; R2
+
+##  R2 = 91,02% da variabilidade de Y ((gasto com alimenta??o) 
+##       ? explicada pela vari?vel preditora X (renda familiar).
+
+## OBS: R2 ? fortemente influenciado pelo n?mero de par?metros considerados no modelo.
+##      Quanto maior o n?mero de par?metros, melhor o ajuste e portanto maior o R2.
+
+## Coeficiente de Determina??o Ajustado
+ n = length(x)    ## tamanho da amostra
+ p = 1            ## n?mero de vari?veis explicativas.      
+ R_ajus = 1 - ((n-1)/(n -(p+1)))*(SQRes/SQT); R_ajus
+# OU
+ R_ajus = R2 - (1-R2)*(p/(n-p-1)); R_ajus
+# Ou simplesmente usando o software
+ ajuste$adj.r.squared
+
+## Obs: O R-quadrado ajustado compara o poder explicativo dos modelos de 
+##      regress?o que cont?m diferentes n?meros de preditores.
+
+################# AN?LISE RESIDUAL DO MRLS
+###### Verificar se os res?duos:
+# s?o normalmente distribu?dos;
+# t?m vari?ncia constante (homoscedasticidade);
+# s?o independentes;
+# n?o existem Outliers influentes
+
+res = resid(mod)  ## Os res?duos do modelo MRLS
+
+##### Normalidade do res?duo
+Norm_test(res)
+
+## Representa??o gr?fica: Quantis amostrais x Quantis te?ricos N(0,1)
+# QQ plot com envelope
+qqplot_env <- function(x, conf){      ## conf = Coeficiente de confian?a
+  n <- length(x)
+  nsim <- 100                         ## N?mero de simula??es
+  dadossim <- matrix(rnorm(n*nsim, mean = mean(x), sd = sd(x)), nrow = n)
+  dadossim <- apply(dadossim,2,sort)
+  infsup <- apply(dadossim,1,quantile, probs = c((1 - conf) / 2,(1 + conf) / 2))
+  xbsim <- rowMeans(dadossim)
+  faixay <- range(x, dadossim)
+  qq0 <- qqnorm(x, xlab = "Quantis te?ricos N(0,1)", ylab = "Quantis amostrais", 
+  pch = 20, ylim = faixay,main="Gr?fico de Probabilidade Normal dos Res?duos")
+  eixox <- sort(qq0$x)
+  lines(eixox, xbsim, lwd=1)
+  lines(eixox, infsup[1,], col = "red")
+  lines(eixox, infsup[2,], col = "red")
+}
+ qqplot_env(res, 0.95)
+   text(-1,13, "Teste de Shapiro-Wilk")
+   text(-1,10, "p.value = 0,7911")
+
+##### Verificar a homoscedasticidade 
+## O teste Breusch-Pagan
+# H0: h? a homoscedasticidade
+# H1: n?o h? a homoscedasticidade
+library(lmtest)
+ bptest(mod)
+
+## A probabilidade de erro ao rejeitar H0 ? de apenas 6,444%.
+## Como 0.06444 > 0.05, n?o ? rejeitada H0 de vari?ncia
+## constante ao n?vel de 5% de signific?ncia. Diante disso, 
+## h? a presen?a de homoscedasticidade.
+
+## An?lise gr?fica: res?duos padronizados x valores ajustados (ou preditivos)
+#  Este gr?fico deve apresentar pontos dispostos aleatoriamente 
+#  sem nenhum padr?o definido
+d = rstandard(mod)
+py <- predict(mod)
+plot(py, d, ylim=c(-2.1,2.1), pch=16, ylab="Res?duos padronizados",
+     xlab="Gastos com alimenta??o preditivos",
+     main="Gr?ficos para an?lise dos res?duos padronizados")
+abline(h=0, lty=3, lwd=2)
+abline(h=2, lty=2, col="red")
+abline(h=-2, lty=2, col="red")
+
+### Histograma dos res?duos padronizados
+hist(d, nclass=5)
+
+##### Verificar independ?ncias dos res?duos
+## Para testar o pressuposto da independ?ncia dos res?duos, 
+## ou a presen?a de autocorrela??o entre eles, pode utilizar-se 
+## o teste de Durbin-Watson (DW).
+# H0: res?duos n?o correlacionados
+# H1: res?duos correlacionados
+
+ dwtest(mod)
+#p.value < alpha => teste significativo
+
+ plot(x, d)
+ abline(h=0)
+
+
+##### N?o existem Outliers influentes
+ cook = cooks.distance(mod)
+ plot(cook, ylab="Dist?ncia de Cooks", pch=19)
+ identify(1:25,cook)
+
+## Medidas de Leverage
+ xx <- model.matrix(mod)
+ lev <- hat(xx)
+ plot(lev, ylab="Medidas de leverage", pch=19)
+ identify(1:25,lev)
+
+## Considera-se a dist?ncia de cook ou  Leverage elevado quando, ver Pestana e Gageiro, 2005
+# COOK > 4/(n-(p+1))
+#LEV1 > 3*(p+1)/n    ## para amostras de dimens?o reduzida
+#LEV2 > 2*(p+1)/n    ## para amostras grandes  
+  p=1
+  n=25
+COOK = 4/(n-p-1); cook[cook > COOK]
+LEV1 = 3*(p+1)/n; lev[lev > LEV1]
+LEV2 = 2*(p+1)/n; lev[lev > LEV2]
+
+## Gr?fico: Re?duos padronizados x Leverage
+  plot(lev, res, xlab="Medidas de leverage", ylab="Res?duos padronizados")
+
+
+## Obs.: Uma dist?ncia de Cook elevada significa que o res?duo ? elevado, 
+##       ou a Leverage para essa observa??o ? elevada, ou ambas as situa??es.
+         Considera-se que observa??es com Dist?ncia de Cook superior a 1 
+         s?o excessivamente influentes.
+ plot(mod)
+
+## Gr?fico de dispers?o do MRLS
+plot(x,y, xlab="Renda Familiar (U.M.)", ylab="Gasto com Alimenta??o (U.M.)",
+     pch=16, las=1, 
+   main="Gasto com alimenta??o em fun??o da renda\n familiar de uma amostra de 25 fam?lias.")
+ abline(mod, col='blue', lwd=2)
+ mtext(expression(hat(y) == 5.4005+0.2558*x), line=-1.5)
+ mtext(expression(r^2 == 0.9102),line=-3)
+
+
+########################################################
+######## Modelo de regress?o Linear Multipla - MRLM ####
+########################################################
+####### Exemplo:
+## Estimar a produtividade da palma forrageira cv. Orelha de 
+## Elefante Mexicana atrav?s de modelagem estat?stica. Ou seja, 
+## construir o modelo de regress?o linear m?ltipla para vari?vel 
+## peso de clad?dio da palma em fun??o das vari?veis morfom?tricas 
+## (comprimento, largura e espessura).
+
+palma <- read.table("D:/Material_IFCE/Aulas_classroom_google/DISCIPLINAS_2020_2/2021_1_proder_estatistica/Material_Aula/Regressão_Linear/Dados_R/palmas.txt", header =TRUE)
+
+### Verificar pontos outliers nas vari?veis
+boxplot(palma)
+
+## Algumas indica??es da presen?a de multicolinearidade:
+## (1) Os coeficientes da correla??o linear entre pares de vari?veis apresentam valores 
+##     muito pr?ximos de 1 ou -1. Tamb?m pode ser observado nos gr?ficos de dispers?o.
+## (2) O teste F da signific?ncia da regress?o rejeita H0, mas nenhuma ? rejeitada 
+##     pelos testes t individuais.
+## (3) Os erros padr?o (Std.Error) dos coeficientes de regress?o s?o muito altos.
+## (4) A an?lise dos fatores de infla??o da vari?ncia (em ingl?s, Variance Inflation Factors - VIF);
+##     Draper e Smith (1998) recomendam que valores de VIF maiores do que 10 podem causar 
+##     s?rios problemas na estima??o dos coeficientes de regress?o.
+
+## Coeficiente de correla??o
+ cor(palma)
+
+### Gr?fico de dispers?o
+par(mar=c(0.5, 0.5, 0.5, 0.5), family="serif")
+plot(palma, cex.lab=0.8, cex.axis=0.8, cex=0.8, cex.sub=0.8)
+## OU
+ pairs(palma)
+
+## Calcular o valor do VIP = (1/(1 - R2)); R2 entre as vari?veis independentes
+require(faraway)
+vif(palma[,c(1,2)])
+vif(palma[,c(1,2,4)])
+ vif(palma)
+
+## Teste de normalidade das vari?veis
+ pa =  palma[,3]
+ Norm_test(pa)
+
+### Teste de signific?ncia do Coeficiente de Correla??o
+## H0: rho == 0
+## H1: rho != 0
+pvalue <- function(tab){
+   p1=0; p2=0; p3=0; p4=0
+   for(i in 1:length(names(palma))){
+   p1[i] = cor.test(palma[,1],palma[,i])$p.value
+   p2[i] = cor.test(palma[,2],palma[,i])$p.value
+   p3[i] = cor.test(palma[,3],palma[,i])$p.value
+   p4[i] = cor.test(palma[,4],palma[,i])$p.value
+   }
+   p = rbind(p1,p2,p3,p4)
+   colnames(p) <- names(palma)
+   rownames(p) <- names(palma)
+   return(p)
+   }
+round(pvalue(palma),8)
+
+### Vari?veis em estudo
+y  <- palma[,3]   ## Peso
+x1 <- palma[,1]   ## Comprimento
+x2 <- palma[,2]   ## Largura
+x3 <- palma[,4]   ## Espessura
+
+########## An?lise para ajuste dos modelos de RLM
+## Modelo: Y = B0 + B1X1 + B2X2 + ... + BpXp
+
+###########################################
+################# PRIMEIRO MODELO  AJUSTADO 
+## Y = B0 + B1X1 + B2X2 + B3X3
+
+## Estimar os par?metros B0, B1, B2, B3
+ mod1 <- lm(y ~ x1+x2+x3); mod1
+
+## ANOVA para ajuste dos par?metros B1, B2, B3
+ #H0: B1 = B2 = B3 = 0
+ anova(mod1)
+
+## An?lise para ajuste individual dos par?metros
+ajuste_1 <- summary(mod1); ajuste_1
+            
+ y1_p    = fitted(mod1)            ## valores preditos do modelo
+ res1    = resid(mod1)             ## residuos do modelo
+ res1_p  = rstandard(mod1)         ## residuos padronizado do modelo
+ R2_1    = ajuste_1$r.squared; R2_1 ## coeficiente de determina??o
+ R2_1adj = ajuste_1$adj.r.squared; R2_1adj ## coeficiente de determina??o ajustado
+
+################# AN?LISE RESIDUAL DO MODELO
+###### Verificar se os res?duos:
+# s?o normalmente distribu?dos;
+# t?m vari?ncia constante (homoscedasticidade);
+# s?o independentes;
+# n?o existem Outliers influentes
+                            
+##### Normalidade do res?duo
+Norm_test(res1)
+
+## QQ plot do res?duo com envelope
+qqplot_env(res1, 0.99)
+text(-1,13, "Teste de Anderson-Darling")
+text(-1,10, "p.value = 0.59585")
+
+##### Res?duos s?o independentes
+## Para testar o pressuposto da independ?ncia dos res?duos, 
+## ou a presen?a de autocorrela??o entre eles, pode utilizar-se 
+## o teste de Durbin-Watson (DW).
+# H0: res?duos n?o correlacionados
+# H0: res?duos correlacionados
+  dwtest(mod1)
+#p.value < alpha => teste significativo
+
+##### Verificar multicolinearidade
+xx1 = x1; ## ou xx1=x2; ou xx1=x3
+plot(xx1, res1_p, xlab="Comprimento (g)", ylab="Res?duos padronizados")
+
+##### Verificar a homoscedasticidade
+## O teste Breusch-Pagan
+# H0: h? a homoscedasticidade
+# H1: n?o h? a homoscedasticidade
+library(lmtest)
+bptest(mod1)
+#p.value < alpha => teste significativo
+
+## An?lise gr?fica: res?duos padronizados x valores ajustados
+par(cex=0.8, family="serif")
+plot(y1_p, res1_p, ylab = "Res?duos padronizado", xlab = "Pesos preditos", pch = 21,lwd=3, cex.lab = 1.0, cex.main = 1.2)
+abline(h=mean(res1_p), lty=2, col=4)
+lines(0,1)
+
+##### N?o existem Outliers influentes
+cook = cooks.distance(mod1)
+ plot(cook, ylab="Dist?ncia de Cooks")
+ identify(1:200,cook)
+
+## Medidas de Leverage
+ xx <- model.matrix(mod1)
+ lev <- hat(xx)
+ plot(lev, ylab="Medidas de leverage")
+ identify(1:200,lev)
+
+## Considera-se a dist?ncia de cook ou  Leverage elevado quando, ver Pestana e Gageiro, 2005
+# COOK > 4/(n-(p+1))
+#LEV > 3*(p+1)/n    ## para amostras de dimens?o reduzida
+#LEV > 2*(p+1)/n    ## para amostras grandes  
+  p=3
+  n=200
+COOK = 4/(n-p-1); cook[cook > COOK]
+LEV1 = 3*(p+1)/n; lev[lev > LEV1]
+LEV2 = 2*(p+1)/n; lev[lev > LEV2]
+
+## Gr?fico: Re?duos padronizados x Leverage
+  plot(lev, res1_p, xlab="Medidas de leverage", ylab="Res?duos padronizados")
+
+## Obs.: Uma dist?ncia de Cook elevada significa que o res?duo ? elevado, 
+##       ou a Leverage para essa observa??o ? elevada, ou ambas as situa??es.
+         Considera-se que observa??es com Dist?ncia de Cook superior a 1 
+         s?o excessivamente influentes.
+plot(mod1)
+
+## Gr?fico: Pesos preditivos x Pesos observados
+plot(y, y1_p, main="", ylab="Pesos preditos (g)", bty="o", 
+     xlab="Pesos observados (g)", pch=16, lwd=1, cex.lab=1.1, cex.main=1.1)
+abline(0,1, lwd=2, col=4)             #obter o gr?fico preditos vs. observados
+
+############################################
+#################### SEGUNDO MODELO AJUSTADO
+## Y = B0 + B1X1 + B2X2 + B3X3 + B4X1^2 + B5X2^2 + B6X3^2 + B7X1X2 + B8X1X3 + B9X2X3
+
+## Estimar os par?metros B0, B1, B2, B3, B4, B5, B6, B7, B8, B9
+mod2 <- lm(y ~ x1 + x2 + x3 + I(x1^2) + I(x2^2) + I(x3^2) + x1:x2 + x1:x3 + x2:x3); mod2
+
+## ANOVA para ajuste dos par?metros
+anova(mod2)
+
+## An?lise de ajuste individual dos par?metros
+ajuste_2 <- summary(mod2); ajuste_2
+
+ y2_p    = fitted(mod2)            ## valores preditos do modelo
+ res2    = resid(mod2)             ## residuos do modelo
+ res2_p  = rstandard(mod2)         ## residuos padronizado do modelo
+ R2_2    = ajuste_2$r.squared; R2_2 ## coeficiente de determina??o
+ R2_2adj = ajuste_2$adj.r.squared; R2_2adj ## coeficiente de determina??o ajustado
+
+################# AN?LISE RESIDUAL DO MODELO
+###### Verificar se os res?duos:
+# s?o normalmente distribu?dos;
+# t?m vari?ncia constante (homoscedasticidade);
+# s?o independentes;
+# n?o existem Outliers influentes
+                            
+##### Normalidade do res?duo
+Norm_test(res2)
+
+## QQ plot do res?duo com envelope
+qqplot_env(res2, 0.95)
+
+##### Res?duos s?o independentes
+## Para testar o pressuposto da independ?ncia dos res?duos, 
+## ou a presen?a de autocorrela??o entre eles, pode utilizar-se 
+## o teste de Durbin-Watson (DW).
+# H0: res?duos n?o correlacionados
+# H0: res?duos correlacionados
+ dwtest(mod2)
+#p.value < alpha => teste significativo
+
+##### Verificar a homoscedasticidade
+## O teste Breusch-Pagan
+# H0: h? a homoscedasticidade
+# H1: n?o h? a homoscedasticidade
+library(lmtest)
+bptest(mod2)
+#p.value < alpha => teste significativo
+
+## An?lise gr?fica: res?duos padronizados x valores ajustados
+par(cex=0.8, family="serif")
+plot(y2_p, res2_p, ylab = "Res?duos padronizado", xlab = "Pesos preditos", pch = 21,lwd=3, cex.lab = 1.0, cex.main = 1.2)
+abline(h=mean(res2_p), lty=2, col=4)
+lines(0,1)
+
+##### N?o existem Outliers influentes
+cook = cooks.distance(mod2)
+ plot(cook, ylab="Dist?ncia de Cooks")
+ identify(1:200,cook)
+
+## Medidas de Leverage
+ xx <- model.matrix(mod2)
+ lev <- hat(xx)
+ plot(lev, ylab="Medidas de leverage")
+ identify(1:200,lev)
+
+## Considera-se a dist?ncia de cook ou  Leverage elevado quando, ver Pestana e Gageiro, 2005
+# COOK > 4/(n-(p+1))
+#LEV > 3*(p+1)/n    ## para amostras de dimens?o reduzida
+#LEV > 2*(p+1)/n    ## para amostras grandes  
+  p=3
+  n=200
+COOK = 4/(N-p-1); cook[cook > COOK]
+LEV1 = 3*(p+1)/n; lev[lev > LEV1]
+LEV2 = 2*(p+1)/n; lev[lev > LEV2]
+
+## Gr?fico: Re?duos padronizados x Leverage
+  plot(lev, res2_p, xlab="Medidas de leverage", ylab="Res?duos padronizados")
+
+## Obs.: Uma dist?ncia de Cook elevada significa que o res?duo ? elevado, 
+##       ou a Leverage para essa observa??o ? elevada, ou ambas as situa??es.
+         Considera-se que observa??es com Dist?ncia de Cook superior a 1 
+         s?o excessivamente influentes.
+plot(mod2)
+
+## Gr?fico: Pesos preditivos x Pesos observados
+plot(y, y2_p, main="", ylab="Pesos preditos (g)", bty="o", 
+     xlab="Pesos observados (g)", pch=16, lwd=1, cex.lab=1.1, cex.main=1.1)
+abline(0,1, lwd=2, col=4)             #obter o gr?fico preditos vs. observados
+
+
+
+
+#########################################################
+## MODELOS DE REGRESSÃO LINEAR MÚLTIPLA usando o pacote "rsm"
+library(rsm)
+
+## Modelo de regressão multivariado de 1º ordem
+mod1 <- rsm(y ~ FO(x1, x2, x3))
+summary(mod1)
+a1 = fitted(mod1)       ### preditos do modelo
+t1 = resid(mod1)        ### residuos do modelo
+rp1 = rstandard(mod1)    ### residuos padronizado do modelo
+
+plot(y, a1, main="", ylab="Pesos preditos (grama)", bty="o",xlim=c(0,100), 
+     xlab="Pesos observados (grama)", pch=16, lwd=1, cex.lab=1.5, cex.main=1.5)
+abline(0,1, lwd=2, col=4)             #obter o gráfico preditos vs. observados
+
+## Modelo de regressão multivariado de 2º ordem
+mod2 <- rsm(y ~ SO(x1, x2, x3))
+summary(mod2)
+
+
+

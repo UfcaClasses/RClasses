@@ -1,0 +1,33 @@
+"0","#O CAMINHO EM QUE ESTÃ O CONJUNTO DE DADOS:"
+"0","#(OBSERVE QUE AS BARRAS NÃƒO SÃƒO INVERTIDAS, COMO NO WINDOWS)"
+"0","dataPath = ""./data/"""
+"0","#A LEITURA DO CONJUNTO DE DADOS"
+"0","dados =   read.csv(file = paste(dataPath, ""BD01.csv"", sep="""")"
+"0","                          , header = TRUE, sep = "";""); "
+"0","#A VISUALIZAÃ‡ÃƒO DO CONJUNTO DE DADOS"
+"0","# View(dados)"
+"0","# install.packages(""kableExtra""); "
+"0","library(kableExtra)"
+"0","# install.packages(""dplyr"")    # alternative installation of the %>%"
+"0","library(dplyr)    # alternatively, this also loads %>%"
+"2","
+Attaching package: ‘dplyr’
+
+"
+"2","The following object is masked from ‘package:kableExtra’:
+
+    group_rows
+
+"
+"2","The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+"
+"2","The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+"
+"0","kable(head(dados, 10)) %>%"
+"0","  kable_styling(full_width = F, bootstrap_options = c(""striped"", ""hover"", ""condensed"", ""responsive""))"
