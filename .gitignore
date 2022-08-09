@@ -1,1 +1,5 @@
 inst/doc
+.Rproj.user
+RClasses.Rcheck/
+RClasses*.tar.gz
+RClasses*.tgz

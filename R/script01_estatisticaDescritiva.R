@@ -1,5 +1,6 @@
 # ler o conjunto de dados
-BD01 = read.csv(file = "G:/Meu Drive/UFCA/Ensino/CRAN R_aulas/RClasses/data/BD01.csv", dec = ".", encoding="UTF-8", sep=";", quote="")
+BD01 =  read.csv(file = "/cloud/project/data/BD01.csv", dec = ".", encoding="UTF-8", sep=";", quote="")#RStudio Cloud
+#BD01 = read.csv(file = "D:/OneDrive - Universidade Federal do Cariri - UFCA/Drive/UFCA/Ensino/CRAN R_aulas/RClasses/data/BD01.csv", dec = ".", encoding="UTF-8", sep=";", quote="")#Praf's computer
 #para visualizar o conjunto
 View(BD01)
 #funções básicas (distribuições de frequência)
