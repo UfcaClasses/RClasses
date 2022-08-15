@@ -19,7 +19,7 @@
 distFreq=function(x, varName=""){
   ret = NULL
   # if the variable is QUALITATIVE
-  if(class(x)=="character" | class(x)=="factor" | class(x)=="ordered"){
+  if(class(x)[1]=="character" | class(x)[1]=="factor" | class(x)[1]=="ordered"){
     distFreq = table(x)
     ret=list(qualitativeData = x, distFreq = distFreq, grid = names(distFreq))
   }
