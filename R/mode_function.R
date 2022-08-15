@@ -30,7 +30,7 @@ ourMode=function(sample, xlab="", toPrint = TRUE, minimalAmplitudeRatioForGroupi
   x=sample
   modes=NULL
   isSimpleApproach = TRUE#if quantitative with little variability or qualitative
-  isQuantitative = ifelse(class(x)=="numeric" | class(x)=="integer", TRUE, FALSE)
+  isQuantitative = ifelse(class(x)[1]=="numeric" | class(x)[1]=="integer", TRUE, FALSE)
   if(isQuantitative){
     n = length(x)
     limits = range(x, na.rm=TRUE)

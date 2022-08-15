@@ -40,12 +40,14 @@ Trazemos aqui algumas chamadas de funções correspondentes à Estatística Desc
 # Introdução
 Carregue as funções da pasta R e o pacote `qcc`. Este último para gráficos de Pareto.
 ```{r setup}
+ROOT = "/cloud/project/"#RStudio Cloud
+# ROOT = "../R/"#local machine
 # library(RClasses)
-# source("../R/classicBoxPlot.R")
-# source("../R/distribFreq.R")
-# source("../R/mode_function.R")
-# source("../R/iqv_function.R")
-# install.packages("qcc")
+source(paste(ROOT, 'R/classicBoxPlot.R', sep=''))
+source(paste(ROOT, 'R/distribFreq.R', sep=''))
+source(paste(ROOT, 'R/mode_function.R', sep=''))
+source(paste(ROOT, 'R/iqv_function.R', sep=''))
+install.packages("qcc")
 ```
 
 # Acesso aos dados
@@ -53,7 +55,8 @@ Recorra ao método `read.csv`:
 ```{r}
 #O CAMINHO EM QUE ESTÁ O CONJUNTO DE DADOS:
 #(OBSERVE QUE AS BARRAS NÃO SÃO INVERTIDAS, COMO NO WINDOWS)
-dataPath = "./data/"
+#dataPath = "./data/"#local machine
+dataPath = "/cloud/project/data/"#RStudio Cloud
 #A LEITURA DO CONJUNTO DE DADOS
 dados =   read.csv(file = paste(dataPath, "BD01.csv", sep="")
                           , header = TRUE, sep = ";"); 
