@@ -86,7 +86,7 @@ dfAbsDegradacao = distFreq(x = dados$Degradacao, varName = "Degradação")
 print(dfAbsDegradacao$distFreq)
 
 dfAbsNFalhas = distFreq(x = dados$nReincidenciaFalhas, varName = "Nº de falhas")
-table(nFalhas=dfAbsNFalhas$qualitativeData, dados$Fornecedor)
+table(nFalhas = dfAbsNFalhas$qualitativeData, dados$Fornecedor)
 ```
 ## Distribuição Bivariada
 Recorra aos métodos `table` e `prop.table`. Recorra também ao método `distFreq`, em caso de quantitativa.
@@ -129,7 +129,7 @@ boxplot(x = dados$TempoFalha, ylab = "Tempo entre falhas", main = "Otimizado pel
 #PARA RESULADO SIMILAR AOS DAS AULAS:
 classicBoxPlot(x = dados$TempoFalha, ylab = "Tempo entre falhas")
 #PARA ASSOCIAÇÃO ENTRE UMA QUANTITATIVA E UMA QUALITATIVA:
-boxplot(dados$TempoFalha~dados$Fornecedor, ylab = "Tempo entre falhas"
+boxplot(dados$TempoFalha ~ dados$Fornecedor, ylab = "Tempo entre falhas"
         , xlab = "Fornecedor")
 
 ```
@@ -165,7 +165,7 @@ iqv(freq = dfDegr$distFreq, varName = "Degradação")
 Recorra às funções `max`, `min` e `quantile`:
 ```{r}
 Amplitude = max(dados$TempoFalha, na.rm=TRUE) - min(dados$TempoFalha, na.rm=TRUE)
-q = quantile(x = dados$TempoFalha, probs = c(.25, .75), na.rm = TRUE)
+q = quantile(x = dados$TempoFalha, probs = c(.25, .75), na.rm = TRUE) # nolint
 AIQ = as.numeric(q[2] - q[1])
 print(AIQ)
 ```
