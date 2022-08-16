@@ -45,7 +45,7 @@ plot(tbNReinc)
 hist(BD01$TempoFalha)
 
 classicBoxPlot(x=BD01$TempoFalha, ylab = "Tempo até a falha")
-install.packages("qcc")
+#install.packages("qcc")
 library(qcc)
 pareto.chart(table(BD01$Degradacao))
 
