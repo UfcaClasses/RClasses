@@ -1,7 +1,7 @@
 #print("ol[a], mundo")
-#install pandas package (Windows):
-! pip install pandas
-#install pandas package (macOS/Linux):
+#install pandas package (prompt Windows):
+# pip install pandas
+#install pandas package (prompt macOS/Linux):
 #! pip3 install pandas#??
 #from base64 import encode
 import pandas as pd
