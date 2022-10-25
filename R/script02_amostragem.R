@@ -1,5 +1,5 @@
 #para ter controle sobre os números pseudo-aleatórios gerados...
-# set.seed(1)#para controlar a sequência gerada de números pseudo-aleatórios
+set.seed(1)#para controlar a sequência gerada de números pseudo-aleatórios
 
 #amostragem aleatoria simples - AASimples
 getSimpleRandomSample = function(dataFrame, sampleSize){
@@ -12,7 +12,7 @@ getSimpleRandomSample = function(dataFrame, sampleSize){
   return(sampleData)
 }
 #amostragem aleatoria sistemática - AASistemática
-getMapingBasedSimpleRandomSample = function(dataFrame, sampleSize){
+getSystematicRandomSample = function(dataFrame, sampleSize){
   N = nrow(dataFrame) #tamanho da população
   n = sampleSize # tamanho da amostra
   ti = 1; tf = N # mínimo e máximo do intervalo de chaves
@@ -45,6 +45,7 @@ getProportionalStratifiedRandomSample = function(dataFrame
     N_i = nrow(dataFrame_i) #tamanho da iª população
     n_i = as.integer(ns[i]) # tamanho da iª amostra
     sampleData_i = getSimpleRandomSample(dataFrame = dataFrame_i, sampleSize = n_i)#View(sampleData_i, title = paste("amostra_", stratum_i) )
+    # sampleData_i = getSystematicRandomSample(dataFrame = dataFrame_i, sampleSize = n_i)#View(sampleData_i, title = paste("amostra_", stratum_i) )
     sampleData = rbind(sampleData, sampleData_i)
   }
   return(sampleData)
@@ -75,28 +76,36 @@ descritiva = function(data){
   debugSource('./R/iqv_function.R', encoding = 'UTF-8')
   debugSource('./R/mode_function.R', encoding = 'UTF-8')
   distFreq(x = data$Fornecedor)
+  print("********* Fornecedor *******")
   ourMode(sample = data$Fornecedor, xlab = "Fornecedor", toPrint = TRUE)
+  print("********* Tempo até a falha *******")
   ourMode(sample = data$TempoFalha, xlab = "Tempo até a falha", toPrint = TRUE)#, minimalAmplitudeRatioForGrouping = .2)
+  print("********* Nº de reincidências de falhas *******")
   ourMode(sample = data$nReincidenciaFalhas, xlab = "Nº de reincidências de falhas", toPrint = TRUE, minimalAmplitudeRatioForGrouping = .2)
 }
 
 #Exemplo: Conjunto de dados de manutenção
 #Ler o conjunto
-BD01 <- read.csv(file = "./data/BD01.csv", dec = ",", encoding="UTF-8", sep=";", quote="")
+BD01 <- read.csv(file = "./data/BD01.csv", dec = ".", encoding="UTF-8", sep=";", quote="")
 #visualizar o conjunto
-# View(BD01)
+View(BD01)
 
-# aaSimples_data = getSimpleRandomSample(dataFrame = BD01, sampleSize = 5)
-# View(aaSimples_data)
-# descritiva(aaSimples_data)
+aaSimples_data = getSimpleRandomSample(dataFrame = BD01, sampleSize = 5)
+View(aaSimples_data)
+descritiva(aaSimples_data)
+descritiva(BD01)
 
-# aaSistematica = getMapingBasedSimpleRandomSample(dataFrame = BD01, sampleSize = 5)
-# View(aaSistematica)
+aaSistematica = getSystematicRandomSample(dataFrame = BD01, sampleSize = 5)
+View(aaSistematica)
+descritiva(aaSistematica)
+descritiva(BD01)
 #
-# aaEstrProp = getProportionalStratifiedRandomSample(dataFrame = BD01
-#                                                    , sampleSize = 5
-#                                                    , stratumVariable = "Fornecedor")
-# View(aaEstrProp)
+aaEstrProp = getProportionalStratifiedRandomSample(dataFrame = BD01
+                                                   , sampleSize = 5
+                                                   , stratumVariable = "Degradacao")
+View(aaEstrProp)
+descritiva(aaEstrProp)
+descritiva(BD01)
 
 #Exemplo: Mapeamento
 bounds = list(lat = list(min = -10, max = -1)
