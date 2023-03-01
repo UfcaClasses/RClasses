@@ -1,7 +1,9 @@
 #Testes de aderência
 #0. Exemplo do lançamento de dado por 300 vezes
+#H0: O dado é honesto
+#H1: O dado não é honesto
 # o = c(43, 49, 56, 45, 66, 41)#observado
-o = c(43, 49, 56, 45, 66, 41)#observado (situação de assimetria)
+o = c(200, 90, 5, 5, 0, 0)#observado (situação de assimetria)
 n = sum(o)#tamanho da amostra
 p0 = rep(1/6, 6)#distribuição pretendida (Uniforme)
 #p: a distribuição de probabilidades subjacente a 'o'
