@@ -1,8 +1,8 @@
 dados = data.frame(
   target = c(42.13, 41.31, 54.30
-                      , 40.00, 48.08, 54.97
-                      , 45.93, 25.69, 34.51
-                      , 21.16)#Tempo de cirurgia
+                  , 40.00, 48.08, 54.97
+                  , 45.93, 25.69, 34.51
+                  , 21.16)#Tempo de cirurgia
   , group = c(rep(c("P1", "P2", "P3"), 3), "P1"))#Médico
 View(dados)
 
