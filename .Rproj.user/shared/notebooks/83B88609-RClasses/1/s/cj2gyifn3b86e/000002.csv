@@ -1,6 +1,0 @@
-"0","#Construindo nova variável, que respeite a ordenação do nível de estresse"
-"0","dados$Degradacao = factor(BD01$Degradacao, order = TRUE,"
-"0","                                    levels = c(""Baixo"", ""Medio"", ""Alto""))"
-"2","Error in factor(BD01$Degradacao, order = TRUE, levels = c(""Baixo"", ""Medio"",  : 
-  object 'BD01' not found
-"

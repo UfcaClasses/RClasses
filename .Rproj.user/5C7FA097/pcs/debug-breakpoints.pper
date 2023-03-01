@@ -1,5 +1,21 @@
 {
     "debugBreakpointsState": {
-        "breakpoints": []
+        "breakpoints": [
+            {
+                "id": 1,
+                "path": "D:/OneDrive - Universidade Federal do Cariri - UFCA/Drive/UFCA/Ensino/CRAN R_aulas/RClasses/R/script01_estatisticaDescritiva.R",
+                "line_number": 7,
+                "function_steps": "",
+                "function_name": "toplevel",
+                "state": 1,
+                "editor_state": 1,
+                "editor_line_number": 7,
+                "is_pending_debug_completion": false,
+                "needs_updated_steps": false,
+                "type": 1,
+                "is_package_breakpoint": false,
+                "package_name": ""
+            }
+        ]
     }
 }

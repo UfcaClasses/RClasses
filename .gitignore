@@ -4,3 +4,7 @@ RClasses.Rcheck/
 RClasses*.tar.gz
 RClasses*.tgz
 RClasses/1/
+RClasses*.pickle
+RClasses*.zip
+RClasses*.csv
+RClasses*.png

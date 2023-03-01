@@ -1,1 +1,0 @@
-{"frames":[{"func":"factor(BD01$Degradacao, order = TRUE, levels = c(\"Baixo\", \"Medio\", \n    \"Alto\"))","file":"","line_number":0,"end_line_number":0,"character_number":0,"end_character_number":0}],"message":"Error in factor(BD01$Degradacao, order = TRUE, levels = c(\"Baixo\", \"Medio\",  : \n  object 'BD01' not found\n"}

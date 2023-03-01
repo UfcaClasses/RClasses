@@ -7,17 +7,17 @@ BD01 =  read.csv(file = "/cloud/project/data/BD01.csv", dec = ".", encoding="UTF
 View(BD01)
 #funções básicas (distribuições de frequência)
 df <- table(BD01$Fornecedor)
-prop.table(df)#dist de frequências relativas
+print(prop.table(df))#dist de frequências relativas
 barplot(df, col = "red", xlab = "Fornecedor", ylab="Frequencia absoluta")#gráfico de barras
 df2 = table(BD01$TempoFalha)#não gera informação
-cbind(df2)
+print(cbind(df2))
 
 #Construindo nova variável, que respeite a ordenação do nível de estresse
-table(BD01$Degradacao)
+print(table(BD01$Degradacao))
 BD01$Degradacao = factor(BD01$Degradacao, order = TRUE,
                                     levels = c("Baixo", "Medio", "Alto"))
 tbDegrad = table(BD01$Degradacao)
-cbind(freAbs = tbDegrad, freqRel = prop.table(tbDegrad))
+print(cbind(freAbs = tbDegrad, freqRel = prop.table(tbDegrad)))
 #View(BD01)
 # DESNECESSÁRIO:
 # Degradacao_ordinal = BD01$Degradacao#
@@ -35,17 +35,17 @@ source('./R/mode_function.R', encoding = 'UTF-8')
 source('./R/iqv_function.R', encoding = 'UTF-8')
 
 # distribuição de frequências dos dados
-distFreq(x = BD01$Fornecedor)
+print(distFreq(x = BD01$Fornecedor))
 df_TempoFalha = distFreq(x = BD01$TempoFalha)
 q_05_tempoFalha = quantile(x = BD01$TempoFalha, probs = c(.05))
 
 tbNReinc = table(BD01$nReincidenciaFalhas)
-cbind(tbNReinc)
+print(cbind(tbNReinc))
 plot(tbNReinc)
 hist(BD01$TempoFalha)
 
 classicBoxPlot(x=BD01$TempoFalha, ylab = "Tempo até a falha")
-install.packages("qcc")
+#install.packages("qcc")
 library(qcc)
 pareto.chart(table(BD01$Degradacao))
 
@@ -58,16 +58,16 @@ boxplot(BD01$TempoFalha~BD01$Fornecedor)#uma qualitativa e uma quantitativa
 ourMode(sample = BD01$Fornecedor, xlab = "Fornecedor", toPrint = TRUE)
 ourMode(sample = BD01$TempoFalha, xlab = "Tempo até a falha", toPrint = TRUE, minimalAmplitudeRatioForGrouping = .2)
 ourMode(sample = BD01$nReincidenciaFalhas, xlab = "Nº de reincidências de falhas", toPrint = TRUE, minimalAmplitudeRatioForGrouping = .2)
-median(BD01$TempoFalha)
-mean(BD01$TempoFalha)
+print(median(BD01$TempoFalha))
+print(mean(BD01$TempoFalha))
 
 #medidas de dispersão
 df_fornecedor  = table(BD01$Fornecedor)
 
-iqv(freq = df_fornecedor, varName = "Fornecedor")
+print(iqv(freq = df_fornecedor, varName = "Fornecedor"))
 #simulando um case com pouca variabilidade
 df_fornecedor[1] = 0
-iqv(freq = df_fornecedor, varName = "Fornecedor")
+print(iqv(freq = df_fornecedor, varName = "Fornecedor"))
 #simulando um case com muita variabilidade
 df_fornecedor[1] = 226
 iqv(freq = df_fornecedor, varName = "Fornecedor")
